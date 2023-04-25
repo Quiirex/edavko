@@ -1,113 +1,30 @@
 <?php
-
-/**
- * The admin-specific functionality of the plugin.
- *
- * @link       http://example.com
- * @since      1.0.0
- *
- * @package    edavko
- * @subpackage edavko/admin
- */
-
-/**
- * The admin-specific functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    edavko
- * @subpackage edavko/admin
- * @author     Your Name <email@example.com>
- */
 class Edavko_Admin
 {
-
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $edavko    The ID of this plugin.
-	 */
 	private $edavko;
-
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
 	private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 * @param      string    $edavko       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
-	 */
 	public function __construct($edavko, $version)
 	{
-
 		$this->edavko = $edavko;
 		$this->version = $version;
 		add_action('admin_menu', array($this, 'add_plugin_admin_menu'), 9);
-		add_action('admin_init', array($this, 'register_and_build_fields'));
+		add_action('admin_init', array($this, 'register_and_build_settings_fields'));
+		add_action('admin_init', array($this, 'register_and_build_verify_invoice_settings_fields'));
+		add_action('admin_init', array($this, 'register_and_build_verify_business_space_settings_fields'));
+		add_action('admin_init', array($this, 'register_and_build_register_business_space_settings_fields'));
 	}
 
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_styles()
 	{
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in edavko_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The edavko_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style($this->edavko, plugin_dir_url(__FILE__) . 'css/edavko-admin.css', array(), $this->version, 'all');
 	}
 
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_scripts()
 	{
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in edavko_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The edavko_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script($this->edavko, plugin_dir_url(__FILE__) . 'js/edavko-admin.js', array('jquery'), $this->version, false);
 	}
 
-	/**
-	 * Register the administration menu for this plugin into the WordPress Dashboard menu.
-	 *
-	 * @since    1.0.0
-	 */
 	public function add_plugin_admin_menu()
 	{
 		//add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
@@ -126,21 +43,11 @@ class Edavko_Admin
 		add_submenu_page($this->edavko, 'Registracija poslovnega prostora', 'Registracija poslovnega prostora', 'administrator', $this->edavko . '-register-business-space', array($this, 'display_plugin_admin_register_business_space'));
 	}
 
-	/**
-	 * Render the admin dashboard page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
 	public function display_plugin_admin_dashboard()
 	{
 		require_once 'partials/' . $this->edavko . '-admin-display.php';
 	}
 
-	/**
-	 * Render the settings page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
 	public function display_plugin_admin_settings()
 	{
 		// set this var to be used in the settings-display view
@@ -152,41 +59,21 @@ class Edavko_Admin
 		require_once 'partials/' . $this->edavko . '-admin-settings-display.php';
 	}
 
-	/**
-	 * Render the check business space page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
 	public function display_plugin_admin_verify_business_space()
 	{
 		require_once 'partials/' . $this->edavko . '-admin-verify-business-space.php';
 	}
 
-	/**
-	 * Render the check invoice page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
 	public function display_plugin_admin_verify_invoice()
 	{
 		require_once 'partials/' . $this->edavko . '-admin-verify-invoice.php';
 	}
 
-	/**
-	 * Render the register business space page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
 	public function display_plugin_admin_register_business_space()
 	{
 		require_once 'partials/' . $this->edavko . '-admin-register-business-space.php';
 	}
 
-	/**
-	 * Add settings action link to the plugins page.
-	 *
-	 * @since    1.0.0
-	 */
 	public function edavko_settings_messages($error_message)
 	{
 		switch ($error_message) {
@@ -205,18 +92,8 @@ class Edavko_Admin
 		);
 	}
 
-	/**
-	 * Add settings action link to the plugins page.
-	 *
-	 * @since    1.0.0
-	 */
-	public function register_and_build_fields()
+	public function register_and_build_settings_fields()
 	{
-		/**
-		 * First, we add_settings_section. This is necessary since all future settings must belong to one.
-		 * Second, add_settings_field
-		 * Third, register_setting
-		 */
 		add_settings_section(
 			// ID used to identify this section and with which to register options
 			'edavko_general_section',
@@ -276,34 +153,241 @@ class Edavko_Admin
 		);
 	}
 
-	/**
-	 * Render the settings page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
+	public function register_and_build_verify_invoice_settings_fields()
+	{
+		add_settings_section(
+			// ID used to identify this section and with which to register options
+			'edavko_verify_invoice_section',
+			// Title to be displayed on the administration page
+			'',
+			// Callback used to render the description of the section
+			array($this, 'edavko_display_verify_invoice'),
+			// Page on which to add this section of options
+			'edavko_verify_invoice_settings'
+		);
+
+		unset($args);
+
+		$args = array(
+			'type'      => 'input',
+			'subtype'   => 'text',
+			'id'    => 'edavko_verify_invoice_zoi',
+			'name'      => 'edavko_verify_invoice_zoi',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
+		);
+
+		add_settings_field(
+			'edavko_verify_invoice_zoi',
+			'ZOI',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_verify_invoice_settings',
+			'edavko_verify_invoice_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_verify_invoice_eor',
+			'EOR',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_verify_invoice_settings',
+			'edavko_verify_invoice_section',
+			$args
+		);
+
+		register_setting(
+			'edavko_verify_invoice_settings',
+			'edavko_verify_invoice_zoi',
+			'edavko_verify_invoice_eor',
+		);
+	}
+
+	public function register_and_build_verify_business_space_settings_fields()
+	{
+		add_settings_section(
+			// ID used to identify this section and with which to register options
+			'edavko_verify_business_space_section',
+			// Title to be displayed on the administration page
+			'',
+			// Callback used to render the description of the section
+			array($this, 'edavko_display_verify_business_space'),
+			// Page on which to add this section of options
+			'edavko_verify_business_space_settings'
+		);
+
+		unset($args);
+
+		$args = array(
+			'type'      => 'input',
+			'subtype'   => 'text',
+			'id'    => 'edavko_verify_business_space',
+			'name'      => 'edavko_verify_business_space',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
+		);
+
+		add_settings_field(
+			'edavko_verify_business_space',
+			'ID poslovnega prostora',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_verify_business_space_settings',
+			'edavko_verify_business_space_section',
+			$args
+		);
+
+		register_setting(
+			'edavko_verify_business_space_settings',
+			'edavko_verify_business_space',
+		);
+	}
+
+	public function register_and_build_register_business_space_settings_fields()
+	{
+		add_settings_section(
+			// ID used to identify this section and with which to register options
+			'edavko_register_business_space_section',
+			// Title to be displayed on the administration page
+			'',
+			// Callback used to render the description of the section
+			array($this, 'edavko_display_register_business_space'),
+			// Page on which to add this section of options
+			'edavko_register_business_space_settings'
+		);
+
+		unset($args);
+
+		$args = array(
+			'type'      => 'input',
+			'subtype'   => 'text',
+			'id'    => 'edavko_register_business_space_id',
+			'name'      => 'edavko_register_business_space_id',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_id',
+			'ID poslovnega prostora',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_katastrska_stevilka',
+			'Katastrska številka',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_stevilka_stavbe',
+			'Številka stavbe',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_stevilka_dela_stavbe',
+			'Številka dela stavbe',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_ulica',
+			'Ulica',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_hisna_stevilka',
+			'Hišna številka',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_obcina',
+			'Občina',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_postna_stevilka',
+			'Poštna številka',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		add_settings_field(
+			'edavko_register_business_space_mesto',
+			'Mesto',
+			array($this, 'edavko_render_settings_field'),
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args
+		);
+
+		register_setting(
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_id',
+			'edavko_register_business_space_katastrska_stevilka',
+			'edavko_register_business_space_stevilka_stavbe',
+			'edavko_register_business_space_stevilka_dela_stavbe',
+			'edavko_register_business_space_ulica',
+			'edavko_register_business_space_hisna_stevilka',
+			'edavko_register_business_space_obcina',
+			'edavko_register_business_space_postna_stevilka',
+			'edavko_register_business_space_mesto'
+		);
+	}
+
 	public function edavko_display_general_account()
 	{
 		echo '<p></p>';
 	}
 
-	/**
-	 * Render the settings page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
+	public function edavko_display_verify_invoice()
+	{
+		echo '<p></p>';
+	}
+
+	public function edavko_display_verify_business_space()
+	{
+		echo '<p></p>';
+	}
+
+	public function edavko_display_register_business_space()
+	{
+		echo '<p></p>';
+	}
+
 	public function edavko_render_settings_field($args)
 	{
-		/* EXAMPLE INPUT
-			'type'      => 'input',
-			'subtype'   => '',
-			'id'    => $this->plugin_name.'_example_setting',
-			'name'      => $this->plugin_name.'_example_setting',
-			'required' => 'required="required"',
-			'get_option_list' => "",
-				'value_type' = serialized OR normal,
-			'wp_data'=>(option or post_meta),
-			'post_id' =>
-			*/
 		if ($args['wp_data'] == 'option') {
 			$wp_data_value = get_option($args['name']);
 		} elseif ($args['wp_data'] == 'post_meta') {
