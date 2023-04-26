@@ -4,11 +4,12 @@
     <div id="icon-themes" class="icon32"></div>
     <h2>Preverjanje poslovnega prostora</h2>
     <?php settings_errors(); ?>
-    <form method="POST" action="options.php">
+    <form method="GET" id="edavko-verify-business-space-form">
         <?php
         settings_fields('edavko_verify_business_space_settings');
         do_settings_sections('edavko_verify_business_space_settings');
+        submit_button('Preveri', 'primary', 'edavko-verify-business-space-submit', false, array('id' => 'edavko-verify-business-space-submit'));
         ?>
-        <?php submit_button(); ?>
     </form>
+    <div id="edavko-verify-business-space-result"></div>
 </div>

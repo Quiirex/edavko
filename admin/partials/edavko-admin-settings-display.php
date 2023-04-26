@@ -8,7 +8,7 @@
         <?php
         settings_fields('edavko_general_settings');
         do_settings_sections('edavko_general_settings');
+        submit_button('Shrani');
         ?>
-        <?php submit_button(); ?>
     </form>
 </div>

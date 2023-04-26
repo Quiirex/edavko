@@ -105,13 +105,15 @@ class Edavko_Admin
 			'edavko_general_settings'
 		);
 
-		unset($args);
+		unset($args1);
+		unset($args2);
+		unset($args3);
 
-		$args = array(
-			'type'      => 'input',
-			'subtype'   => 'text',
-			'id'    => 'edavko_furs_api_token',
-			'name'      => 'edavko_furs_api_token',
+		$args1 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_furs_api_token',
+			'name' => 'edavko_furs_api_token',
 			'required' => 'true',
 			'get_options_list' => '',
 			'value_type' => 'normal',
@@ -120,11 +122,22 @@ class Edavko_Admin
 
 		add_settings_field(
 			'edavko_furs_api_token',
-			'FURS API Token',
+			'FURS API Žeton',
 			array($this, 'edavko_render_settings_field'),
 			'edavko_general_settings',
 			'edavko_general_section',
-			$args
+			$args1
+		);
+
+		$args2 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_furs_business_space_id',
+			'name' => 'edavko_furs_business_space_id',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -133,7 +146,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_general_settings',
 			'edavko_general_section',
-			$args
+			$args2
+		);
+
+		$args3 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_furs_electronic_device_id',
+			'name' => 'edavko_furs_electronic_device_id',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -142,13 +166,21 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_general_settings',
 			'edavko_general_section',
-			$args
+			$args3
 		);
 
 		register_setting(
 			'edavko_general_settings',
-			'edavko_furs_api_token',
-			'edavko_furs_business_space_id',
+			'edavko_furs_api_token'
+		);
+
+		register_setting(
+			'edavko_general_settings',
+			'edavko_furs_business_space_id'
+		);
+
+		register_setting(
+			'edavko_general_settings',
 			'edavko_furs_electronic_device_id'
 		);
 	}
@@ -166,13 +198,14 @@ class Edavko_Admin
 			'edavko_verify_invoice_settings'
 		);
 
-		unset($args);
+		unset($args1);
+		unset($args2);
 
-		$args = array(
-			'type'      => 'input',
-			'subtype'   => 'text',
-			'id'    => 'edavko_verify_invoice_zoi',
-			'name'      => 'edavko_verify_invoice_zoi',
+		$args1 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_verify_invoice_zoi',
+			'name' => 'edavko_verify_invoice_zoi',
 			'required' => 'true',
 			'get_options_list' => '',
 			'value_type' => 'normal',
@@ -185,7 +218,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_verify_invoice_settings',
 			'edavko_verify_invoice_section',
-			$args
+			$args1
+		);
+
+		$args2 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_verify_invoice_eor',
+			'name' => 'edavko_verify_invoice_eor',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -194,13 +238,7 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_verify_invoice_settings',
 			'edavko_verify_invoice_section',
-			$args
-		);
-
-		register_setting(
-			'edavko_verify_invoice_settings',
-			'edavko_verify_invoice_zoi',
-			'edavko_verify_invoice_eor',
+			$args2
 		);
 	}
 
@@ -220,10 +258,10 @@ class Edavko_Admin
 		unset($args);
 
 		$args = array(
-			'type'      => 'input',
-			'subtype'   => 'text',
-			'id'    => 'edavko_verify_business_space',
-			'name'      => 'edavko_verify_business_space',
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_verify_business_space',
+			'name' => 'edavko_verify_business_space',
 			'required' => 'true',
 			'get_options_list' => '',
 			'value_type' => 'normal',
@@ -237,11 +275,6 @@ class Edavko_Admin
 			'edavko_verify_business_space_settings',
 			'edavko_verify_business_space_section',
 			$args
-		);
-
-		register_setting(
-			'edavko_verify_business_space_settings',
-			'edavko_verify_business_space',
 		);
 	}
 
@@ -258,13 +291,21 @@ class Edavko_Admin
 			'edavko_register_business_space_settings'
 		);
 
-		unset($args);
+		unset($args1);
+		unset($args2);
+		unset($args3);
+		unset($args4);
+		unset($args5);
+		unset($args6);
+		unset($args7);
+		unset($args8);
+		unset($args9);
 
-		$args = array(
-			'type'      => 'input',
-			'subtype'   => 'text',
-			'id'    => 'edavko_register_business_space_id',
-			'name'      => 'edavko_register_business_space_id',
+		$args1 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_id',
+			'name' => 'edavko_register_business_space_id',
 			'required' => 'true',
 			'get_options_list' => '',
 			'value_type' => 'normal',
@@ -277,7 +318,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
+			$args1
+		);
+
+		$args2 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_katastrska_stevilka',
+			'name' => 'edavko_register_business_space_katastrska_stevilka',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -286,7 +338,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
+			$args2
+		);
+
+		$args3 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_stevilka_stavbe',
+			'name' => 'edavko_register_business_space_stevilka_stavbe',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -295,7 +358,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
+			$args3
+		);
+
+		$args4 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_stevilka_dela_stavbe',
+			'name' => 'edavko_register_business_space_stevilka_dela_stavbe',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -304,7 +378,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
+			$args4
+		);
+
+		$args5 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_ulica',
+			'name' => 'edavko_register_business_space_ulica',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -313,7 +398,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
+			$args5
+		);
+
+		$args6 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_hisna_stevilka',
+			'name' => 'edavko_register_business_space_hisna_stevilka',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -322,7 +418,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
+			$args6
+		);
+
+		$args7 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_obcina',
+			'name' => 'edavko_register_business_space_obcina',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option',
 		);
 
 		add_settings_field(
@@ -331,7 +438,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
+			$args7
+		);
+
+		$args8 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_postna_stevilka',
+			'name' => 'edavko_register_business_space_postna_stevilka',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -340,7 +458,18 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
+			$args8
+		);
+
+		$args9 = array(
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_mesto',
+			'name' => 'edavko_register_business_space_mesto',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
 		);
 
 		add_settings_field(
@@ -349,20 +478,7 @@ class Edavko_Admin
 			array($this, 'edavko_render_settings_field'),
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args
-		);
-
-		register_setting(
-			'edavko_register_business_space_settings',
-			'edavko_register_business_space_id',
-			'edavko_register_business_space_katastrska_stevilka',
-			'edavko_register_business_space_stevilka_stavbe',
-			'edavko_register_business_space_stevilka_dela_stavbe',
-			'edavko_register_business_space_ulica',
-			'edavko_register_business_space_hisna_stevilka',
-			'edavko_register_business_space_obcina',
-			'edavko_register_business_space_postna_stevilka',
-			'edavko_register_business_space_mesto'
+			$args9
 		);
 	}
 

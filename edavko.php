@@ -14,9 +14,10 @@
  *
  * @wordpress-plugin
  * Plugin Name:       eDavko
- * Description:       Plugin used for electronic validation of all invoices with FURS.
+ * Description:       E-verification of invoices with FURS.
  * Version:           1.0.0
  * Author:            Luka Mlinarič
+ * Author URI:        https://github.com/Quiirex
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       edavko
