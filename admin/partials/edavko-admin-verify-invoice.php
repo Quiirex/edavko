@@ -13,6 +13,6 @@
         ?>
     </form>
     <div id="edavko-verify-invoice-result">
-        <?php $this->display_result_message(); ?>
+        <?php $this->display_invoice_verification_result_message(); ?>
     </div>
 </div>
