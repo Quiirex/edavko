@@ -3,6 +3,7 @@ class Edavko_Admin
 {
 	private $edavko;
 	private $version;
+	private $result_message = '';
 
 	public function __construct($edavko, $version)
 	{
@@ -13,6 +14,7 @@ class Edavko_Admin
 		add_action('admin_init', array($this, 'register_and_build_verify_invoice_settings_fields'));
 		add_action('admin_init', array($this, 'register_and_build_verify_business_space_settings_fields'));
 		add_action('admin_init', array($this, 'register_and_build_register_business_space_settings_fields'));
+		add_action('admin_init', array($this, 'handle_form_submission'));
 	}
 
 	public function enqueue_styles()
@@ -534,6 +536,53 @@ class Edavko_Admin
 			default:
 				# code...
 				break;
+		}
+	}
+
+	public function display_result_message()
+	{
+		echo $this->result_message;
+	}
+
+	public function handle_form_submission()
+	{
+		if (!isset($_POST['edavko_verify_invoice_nonce']) || !wp_verify_nonce($_POST['edavko_verify_invoice_nonce'], 'edavko_verify_invoice_nonce_action')) {
+			return;
+		}
+
+		$zoi = isset($_POST['edavko_verify_invoice_zoi']) ? sanitize_text_field($_POST['edavko_verify_invoice_zoi']) : '';
+		$eor = isset($_POST['edavko_verify_invoice_eor']) ? sanitize_text_field($_POST['edavko_verify_invoice_eor']) : '';
+
+		if ($zoi && $eor) {
+			$url = 'http://studentdocker.informatika.uni-mb.si:49163/check-invoice?eor=' . $eor;
+		} elseif ($zoi) {
+			$url = 'http://studentdocker.informatika.uni-mb.si:49163/check-invoice?zoi=' . $zoi;
+		} elseif ($eor) {
+			$url = 'http://studentdocker.informatika.uni-mb.si:49163/check-invoice?eor=' . $eor;
+		} else {
+			$this->result_message = '<p>Vnesite ZOI ali EOR!</p>';
+			return;
+		}
+
+		$response = wp_remote_get(
+			$url,
+			array(
+				'headers' => array(
+					'Authorization' => 'Bearer 1002376637',
+				),
+			)
+		);
+
+		if (is_wp_error($response)) {
+			$this->result_message = '<p>Napaka pri obdelavi zahteve: ' . $response->get_error_message() . '</p>';
+		} else {
+			$response_body = json_decode(wp_remote_retrieve_body($response), true);
+
+			if (isset($response_body['TAX']) && isset($response_body['AMOUNT']) && isset($response_body['DATETIME']) && isset($response_body['CONTENT'])) {
+				$this->result_message = '<p>Račun je veljaven.</p>';
+			} else {
+				$this->result_message = '<p>Račun ni veljaven.</p>';
+			}
 		}
 	}
 }
