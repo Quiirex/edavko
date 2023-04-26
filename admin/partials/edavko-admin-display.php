@@ -1,20 +1,4 @@
 <?php
-
-/**
- * Provide an admin area view for the eDavko plugin
- *
- * This file is used to markup the admin-facing aspects of the eDavko plugin. eDavko is a tax invoice validation system
- * that ensures compliance with the regulations set forth by the Financial Administration of the Republic of Slovenia (FURS).
- * The system requires all VAT taxable persons to issue invoices via an electronic device connected to the central information
- * system of the FURS. This dashboard provides a user-friendly interface for managing the eDavko plugin, including settings,
- * validation logs, and invoice management.
- *
- * @link       http://example.com
- * @since      1.0.0
- *
- * @package    edavko
- * @subpackage edavko/admin/partials
- */
 ?>
 
 <style>
