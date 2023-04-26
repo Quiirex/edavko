@@ -552,39 +552,34 @@ class Edavko_Admin
 			return;
 		}
 
-		$zoi = isset($_POST['edavko_verify_invoice_zoi']) ? sanitize_text_field($_POST['edavko_verify_invoice_zoi']) : '';
-		$eor = isset($_POST['edavko_verify_invoice_eor']) ? sanitize_text_field($_POST['edavko_verify_invoice_eor']) : '';
+		$zoi = sanitize_text_field($_POST['edavko_verify_invoice_zoi'] ?? '');
+		$eor = sanitize_text_field($_POST['edavko_verify_invoice_eor'] ?? '');
 
-		if ($zoi && $eor) {
-			$url = 'http://studentdocker.informatika.uni-mb.si:49163/check-invoice?eor=' . $eor;
-		} elseif ($zoi) {
-			$url = 'http://studentdocker.informatika.uni-mb.si:49163/check-invoice?zoi=' . $zoi;
-		} elseif ($eor) {
-			$url = 'http://studentdocker.informatika.uni-mb.si:49163/check-invoice?eor=' . $eor;
-		} else {
+		if (!$zoi && !$eor) {
 			$this->invoice_verification_result_message = '<p>Vnesite ZOI ali EOR!</p>';
 			return;
 		}
 
-		$response = wp_remote_get(
-			$url,
-			array(
-				'headers' => array(
-					'Authorization' => 'Bearer 1002376637',
-				),
-			)
-		);
+		$params = $zoi ? ['zoi' => $zoi] : ['eor' => $eor];
+		$url = add_query_arg($params, 'http://studentdocker.informatika.uni-mb.si:49163/check-invoice');
+
+		$response = wp_remote_get($url, [
+			'headers' => [
+				'Authorization' => 'Bearer 1002376637',
+			],
+		]);
 
 		if (is_wp_error($response)) {
-			$this->invoice_verification_result_message = '<p>Napaka pri obdelavi zahteve: ' . $response->get_error_message() . '</p>';
-		} else {
-			$response_body = json_decode(wp_remote_retrieve_body($response), true);
+			$this->invoice_verification_result_message = sprintf('<p>Napaka pri obdelavi zahteve: %s</p>', $response->get_error_message());
+			return;
+		}
 
-			if (isset($response_body['TAX']) && isset($response_body['AMOUNT']) && isset($response_body['DATETIME']) && isset($response_body['CONTENT'])) {
-				$this->invoice_verification_result_message = '<p>Račun je veljaven.</p>';
-			} else {
-				$this->invoice_verification_result_message = '<p>Račun ni veljaven.</p>';
-			}
+		$response_body = json_decode(wp_remote_retrieve_body($response), true);
+
+		if (isset($response_body['TAX'], $response_body['AMOUNT'], $response_body['DATETIME'], $response_body['CONTENT'])) {
+			$this->invoice_verification_result_message = sprintf('<p>Račun je veljaven.</p><ul><li><b>Davčna številka</b>: "%s"</li><li><b>Znesek</b>: "%s"</li><li><b>Datum in čas</b>: "%s"</li></ul>', $response_body['TAX'], $response_body['AMOUNT'], $response_body['DATETIME']);
+		} else {
+			$this->invoice_verification_result_message = '<p>Račun ni veljaven.</p>';
 		}
 	}
 
@@ -598,35 +593,41 @@ class Edavko_Admin
 		if (!isset($_POST['edavko_verify_business_space_nonce']) || !wp_verify_nonce($_POST['edavko_verify_business_space_nonce'], 'edavko_verify_business_space_nonce_action')) {
 			return;
 		}
-
 		$id_business_space = isset($_POST['edavko_verify_business_space']) ? sanitize_text_field($_POST['edavko_verify_business_space']) : '';
 
 		if (!$id_business_space) {
 			$this->business_space_verification_result_message = '<p>Vnesite ID poslovnega prostora!</p>';
 			return;
-		} else {
-			$url = 'http://studentdocker.informatika.uni-mb.si:49163/check-premise?id=' . $id_business_space;
 		}
 
-		$response = wp_remote_get(
-			$url,
-			array(
-				'headers' => array(
-					'Authorization' => 'Bearer 1002376637',
-				),
-			)
-		);
+		$params = ['id' => $id_business_space];
+		$url = add_query_arg($params, 'http://studentdocker.informatika.uni-mb.si:49163/check-premise');
+
+		$response = wp_remote_get($url, [
+			'headers' => [
+				'Authorization' => 'Bearer 1002376637'
+			]
+		]);
 
 		if (is_wp_error($response)) {
 			$this->business_space_verification_result_message = '<p>Napaka pri obdelavi zahteve: ' . $response->get_error_message() . '</p>';
-		} else {
-			$response_body = json_decode(wp_remote_retrieve_body($response), true);
+			return;
+		}
 
-			if (isset($response_body['Data']) && is_array($response_body['Data']) && count($response_body['Data']) > 0) {
-				$this->business_space_verification_result_message = '<p>Poslovni prostor je veljaven.</p>';
-			} else {
-				$this->business_space_verification_result_message = '<p>Poslovni prostor ni veljaven.</p>';
+		$response_body = json_decode(wp_remote_retrieve_body($response), true);
+
+		if (isset($response_body['Data']) && is_array($response_body['Data']) && count($response_body['Data']) > 0) {
+			$result_message = '<p>Poslovni prostor je veljaven.</p><ul>';
+
+			foreach ($response_body['Data'] as $data) {
+				$result_message .= '<li><b>' . $data['Field_name'] . '</b>: "' . $data['Field_value'] . '"</li>';
 			}
+
+			$result_message .= '</ul>';
+
+			$this->business_space_verification_result_message = $result_message;
+		} else {
+			$this->business_space_verification_result_message = '<p>Poslovni prostor ni veljaven/ne obstaja.</p>';
 		}
 	}
 }
