@@ -5,46 +5,51 @@ class Edavko_Admin
 	private $version;
 	private $invoice_verification_result_message = '';
 	private $business_space_verification_result_message = '';
+	private $business_space_registration_result_message = '';
+	private $settings_set_result_message = '';
 
 	public function __construct($edavko, $version)
 	{
 		$this->edavko = $edavko;
 		$this->version = $version;
-		add_action('admin_menu', array($this, 'add_plugin_admin_menu'), 9);
-		add_action('admin_init', array($this, 'register_and_build_settings_fields'));
-		add_action('admin_init', array($this, 'register_and_build_verify_invoice_settings_fields'));
-		add_action('admin_init', array($this, 'register_and_build_verify_business_space_settings_fields'));
-		add_action('admin_init', array($this, 'register_and_build_register_business_space_settings_fields'));
-		add_action('admin_init', array($this, 'handle_invoice_verification_submission'));
-		add_action('admin_init', array($this, 'handle_business_space_verification_submission'));
+
+		add_action('admin_menu', [$this, 'add_plugin_admin_menu'], 9);
+		add_action('admin_init', [$this, 'register_and_build_settings_fields']);
+		add_action('admin_init', [$this, 'register_and_build_verify_invoice_settings_fields']);
+		add_action('admin_init', [$this, 'register_and_build_verify_business_space_settings_fields']);
+		add_action('admin_init', [$this, 'register_and_build_register_business_space_settings_fields']);
+		add_action('admin_init', [$this, 'handle_invoice_verification_submission']);
+		add_action('admin_init', [$this, 'handle_business_space_verification_submission']);
+		add_action('admin_init', [$this, 'handle_business_space_registration_submission']);
+		add_action('admin_init', [$this, 'handle_settings_set_submission']);
 	}
 
 	public function enqueue_styles()
 	{
-		wp_enqueue_style($this->edavko, plugin_dir_url(__FILE__) . 'css/edavko-admin.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->edavko, plugin_dir_url(__FILE__) . 'css/edavko-admin.css', [], $this->version, 'all');
 	}
 
 	public function enqueue_scripts()
 	{
-		wp_enqueue_script($this->edavko, plugin_dir_url(__FILE__) . 'js/edavko-admin.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->edavko, plugin_dir_url(__FILE__) . 'js/edavko-admin.js', ['jquery'], $this->version, false);
 	}
 
 	public function add_plugin_admin_menu()
 	{
 		//add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-		add_menu_page($this->edavko, 'eDavko', 'administrator', $this->edavko, array($this, 'display_plugin_admin_dashboard'), 'dashicons-money', 26);
+		add_menu_page($this->edavko, 'eDavko', 'administrator', $this->edavko, [$this, 'display_plugin_admin_dashboard'], 'dashicons-money', 26);
 
 		//add_submenu_page( '$parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
-		add_submenu_page($this->edavko, 'eDavko nastavitve', 'Nastavitve', 'administrator', $this->edavko . '-settings', array($this, 'display_plugin_admin_settings'));
+		add_submenu_page($this->edavko, 'eDavko nastavitve', 'Nastavitve', 'administrator', $this->edavko . '-settings', [$this, 'display_plugin_admin_settings']);
 
 		//add_submenu_page( '$parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
-		add_submenu_page($this->edavko, 'Preverjanje poslovnega prostora', 'Preverjanje poslovnega prostora', 'administrator', $this->edavko . '-verify-business-space', array($this, 'display_plugin_admin_verify_business_space'));
+		add_submenu_page($this->edavko, 'Preverjanje poslovnega prostora', 'Preverjanje poslovnega prostora', 'administrator', $this->edavko . '-verify-business-space', [$this, 'display_plugin_admin_verify_business_space']);
 
 		//add_submenu_page( '$parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
-		add_submenu_page($this->edavko, 'Preverjanje izdanega računa', 'Preverjanje izdanega računa', 'administrator', $this->edavko . '-verify-invoice', array($this, 'display_plugin_admin_verify_invoice'));
+		add_submenu_page($this->edavko, 'Preverjanje izdanega računa', 'Preverjanje izdanega računa', 'administrator', $this->edavko . '-verify-invoice', [$this, 'display_plugin_admin_verify_invoice']);
 
 		//add_submenu_page( '$parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
-		add_submenu_page($this->edavko, 'Registracija poslovnega prostora', 'Registracija poslovnega prostora', 'administrator', $this->edavko . '-register-business-space', array($this, 'display_plugin_admin_register_business_space'));
+		add_submenu_page($this->edavko, 'Registracija poslovnega prostora', 'Registracija poslovnega prostora', 'administrator', $this->edavko . '-register-business-space', [$this, 'display_plugin_admin_register_business_space']);
 	}
 
 	public function display_plugin_admin_dashboard()
@@ -57,7 +62,7 @@ class Edavko_Admin
 		// set this var to be used in the settings-display view
 		$active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
 		if (isset($_GET['error_message'])) {
-			add_action('admin_notices', array($this, 'edavko_settings_messages'));
+			add_action('admin_notices', [$this, 'edavko_settings_messages']);
 			do_action('admin_notices', $_GET['error_message']);
 		}
 		require_once 'partials/' . $this->edavko . '-admin-settings-display.php';
@@ -104,7 +109,7 @@ class Edavko_Admin
 			// Title to be displayed on the administration page
 			'',
 			// Callback used to render the description of the section
-			array($this, 'edavko_display_general_account'),
+			[$this, 'edavko_display_general_account'],
 			// Page on which to add this section of options
 			'edavko_general_settings'
 		);
@@ -113,7 +118,7 @@ class Edavko_Admin
 		unset($args2);
 		unset($args3);
 
-		$args1 = array(
+		$args1 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_furs_api_token',
@@ -122,18 +127,18 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_furs_api_token',
 			'FURS API Žeton',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_general_settings',
 			'edavko_general_section',
 			$args1
 		);
 
-		$args2 = array(
+		$args2 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_furs_business_space_id',
@@ -142,18 +147,18 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_furs_business_space_id',
 			'ID Poslovnega prostora',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_general_settings',
 			'edavko_general_section',
 			$args2
 		);
 
-		$args3 = array(
+		$args3 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_furs_electronic_device_id',
@@ -162,12 +167,12 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_furs_electronic_device_id',
 			'ID Elektronske naprave',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_general_settings',
 			'edavko_general_section',
 			$args3
@@ -197,7 +202,7 @@ class Edavko_Admin
 			// Title to be displayed on the administration page
 			'',
 			// Callback used to render the description of the section
-			array($this, 'edavko_display_verify_invoice'),
+			[$this, 'edavko_display_verify_invoice'],
 			// Page on which to add this section of options
 			'edavko_verify_invoice_settings'
 		);
@@ -205,7 +210,7 @@ class Edavko_Admin
 		unset($args1);
 		unset($args2);
 
-		$args1 = array(
+		$args1 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_verify_invoice_zoi',
@@ -214,18 +219,18 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_verify_invoice_zoi',
 			'ZOI',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_verify_invoice_settings',
 			'edavko_verify_invoice_section',
 			$args1
 		);
 
-		$args2 = array(
+		$args2 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_verify_invoice_eor',
@@ -234,12 +239,12 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_verify_invoice_eor',
 			'EOR',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_verify_invoice_settings',
 			'edavko_verify_invoice_section',
 			$args2
@@ -254,14 +259,14 @@ class Edavko_Admin
 			// Title to be displayed on the administration page
 			'',
 			// Callback used to render the description of the section
-			array($this, 'edavko_display_verify_business_space'),
+			[$this, 'edavko_display_verify_business_space'],
 			// Page on which to add this section of options
 			'edavko_verify_business_space_settings'
 		);
 
 		unset($args);
 
-		$args = array(
+		$args = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_verify_business_space',
@@ -270,12 +275,12 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_verify_business_space',
 			'ID poslovnega prostora',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_verify_business_space_settings',
 			'edavko_verify_business_space_section',
 			$args
@@ -290,7 +295,7 @@ class Edavko_Admin
 			// Title to be displayed on the administration page
 			'',
 			// Callback used to render the description of the section
-			array($this, 'edavko_display_register_business_space'),
+			[$this, 'edavko_display_register_business_space'],
 			// Page on which to add this section of options
 			'edavko_register_business_space_settings'
 		);
@@ -305,7 +310,7 @@ class Edavko_Admin
 		unset($args8);
 		unset($args9);
 
-		$args1 = array(
+		$args1 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_register_business_space_id',
@@ -314,78 +319,78 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_id',
 			'ID poslovnega prostora',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
 			$args1
 		);
 
-		$args2 = array(
+		$args2 = [
 			'type' => 'input',
-			'subtype' => 'text',
+			'subtype' => 'number',
 			'id' => 'edavko_register_business_space_katastrska_stevilka',
 			'name' => 'edavko_register_business_space_katastrska_stevilka',
 			'required' => 'true',
 			'get_options_list' => '',
-			'value_type' => 'normal',
+			'value_type' => 'numeric',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_katastrska_stevilka',
 			'Katastrska številka',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
 			$args2
 		);
 
-		$args3 = array(
+		$args3 = [
 			'type' => 'input',
-			'subtype' => 'text',
+			'subtype' => 'number',
 			'id' => 'edavko_register_business_space_stevilka_stavbe',
 			'name' => 'edavko_register_business_space_stevilka_stavbe',
 			'required' => 'true',
 			'get_options_list' => '',
-			'value_type' => 'normal',
+			'value_type' => 'numeric',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_stevilka_stavbe',
 			'Številka stavbe',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
 			$args3
 		);
 
-		$args4 = array(
+		$args4 = [
 			'type' => 'input',
-			'subtype' => 'text',
+			'subtype' => 'number',
 			'id' => 'edavko_register_business_space_stevilka_dela_stavbe',
 			'name' => 'edavko_register_business_space_stevilka_dela_stavbe',
 			'required' => 'true',
 			'get_options_list' => '',
-			'value_type' => 'normal',
+			'value_type' => 'numeric',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_stevilka_dela_stavbe',
 			'Številka dela stavbe',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
 			$args4
 		);
 
-		$args5 = array(
+		$args5 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_register_business_space_ulica',
@@ -394,18 +399,18 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_ulica',
 			'Ulica',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
 			$args5
 		);
 
-		$args6 = array(
+		$args6 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_register_business_space_hisna_stevilka',
@@ -414,18 +419,38 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_hisna_stevilka',
 			'Hišna številka',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
 			$args6
 		);
 
-		$args7 = array(
+		$args7 = [
+			'type' => 'input',
+			'subtype' => 'text',
+			'id' => 'edavko_register_business_space_hisna_stevilka_add',
+			'name' => 'edavko_register_business_space_hisna_stevilka_add',
+			'required' => 'true',
+			'get_options_list' => '',
+			'value_type' => 'normal',
+			'wp_data' => 'option'
+		];
+
+		add_settings_field(
+			'edavko_register_business_space_hisna_stevilka_add',
+			'Hišna številka dodatek',
+			[$this, 'edavko_render_settings_field'],
+			'edavko_register_business_space_settings',
+			'edavko_register_business_space_section',
+			$args7
+		);
+
+		$args8 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_register_business_space_obcina',
@@ -434,18 +459,18 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option',
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_obcina',
 			'Občina',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args7
+			$args8
 		);
 
-		$args8 = array(
+		$args9 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_register_business_space_postna_stevilka',
@@ -454,18 +479,18 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_postna_stevilka',
 			'Poštna številka',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args8
+			$args9
 		);
 
-		$args9 = array(
+		$args10 = [
 			'type' => 'input',
 			'subtype' => 'text',
 			'id' => 'edavko_register_business_space_mesto',
@@ -474,15 +499,15 @@ class Edavko_Admin
 			'get_options_list' => '',
 			'value_type' => 'normal',
 			'wp_data' => 'option'
-		);
+		];
 
 		add_settings_field(
 			'edavko_register_business_space_mesto',
 			'Mesto',
-			array($this, 'edavko_render_settings_field'),
+			[$this, 'edavko_render_settings_field'],
 			'edavko_register_business_space_settings',
 			'edavko_register_business_space_section',
-			$args9
+			$args10
 		);
 	}
 
@@ -541,6 +566,36 @@ class Edavko_Admin
 		}
 	}
 
+	public function display_settings_set_result_message()
+	{
+		echo $this->settings_set_result_message;
+	}
+
+	public function handle_settings_set_submission()
+	{
+		$url = 'http://studentdocker.informatika.uni-mb.si:49163';
+
+		$response = wp_remote_get($url, [
+			'headers' => [
+				'Authorization' => 'Bearer 1002376637'
+			]
+		]);
+
+		if (is_wp_error($response)) {
+			$this->settings_set_result_message = '<p>Povezava na FURS davčno blagajno neuspešna: ' . $response->get_error_message() . '</p>';
+			return;
+		}
+
+		$response_body = json_decode(wp_remote_retrieve_body($response), true);
+
+		if (isset($response_body['EchoRequest'])) {
+			$result_message = '<p>Povezava na FURS davčno blagajno uspešna.</p>';
+			$this->settings_set_result_message = $result_message;
+		} else {
+			$this->settings_set_result_message = '<p>Povezava na FURS davčno blagajno neuspešna.</p>';
+		}
+	}
+
 	public function display_invoice_verification_result_message()
 	{
 		echo $this->invoice_verification_result_message;
@@ -593,6 +648,7 @@ class Edavko_Admin
 		if (!isset($_POST['edavko_verify_business_space_nonce']) || !wp_verify_nonce($_POST['edavko_verify_business_space_nonce'], 'edavko_verify_business_space_nonce_action')) {
 			return;
 		}
+
 		$id_business_space = isset($_POST['edavko_verify_business_space']) ? sanitize_text_field($_POST['edavko_verify_business_space']) : '';
 
 		if (!$id_business_space) {
@@ -629,5 +685,102 @@ class Edavko_Admin
 		} else {
 			$this->business_space_verification_result_message = '<p>Poslovni prostor ni veljaven/ne obstaja.</p>';
 		}
+	}
+
+	public function display_business_space_registration_result_message()
+	{
+		echo $this->business_space_registration_result_message;
+	}
+
+	public function handle_business_space_registration_submission()
+	{
+		if (!isset($_POST['edavko_register_business_space_nonce']) || !wp_verify_nonce($_POST['edavko_register_business_space_nonce'], 'edavko_register_business_space_nonce_action')) {
+			return;
+		}
+
+		$id_business_space = isset($_POST['edavko_register_business_space_id']) ? sanitize_text_field($_POST['edavko_register_business_space_id']) : '';
+		$katastrska_stevilka = isset($_POST['edavko_register_business_space_katastrska_stevilka']) ? sanitize_text_field($_POST['edavko_register_business_space_katastrska_stevilka']) : 0;
+		$stevilka_stavbe = isset($_POST['edavko_register_business_space_stevilka_stavbe']) ? sanitize_text_field($_POST['edavko_register_business_space_stevilka_stavbe']) : 0;
+		$stevilka_dela_stavbe = isset($_POST['edavko_register_business_space_stevilka_dela_stavbe']) ? sanitize_text_field($_POST['edavko_register_business_space_stevilka_dela_stavbe']) : 0;
+		$ulica = isset($_POST['edavko_register_business_space_ulica']) ? sanitize_text_field($_POST['edavko_register_business_space_ulica']) : '';
+		$hisna_stevilka = isset($_POST['edavko_register_business_space_hisna_stevilka']) ? sanitize_text_field($_POST['edavko_register_business_space_hisna_stevilka']) : '';
+		$hisna_stevilka_add = isset($_POST['edavko_register_business_space_hisna_stevilka_add']) ? sanitize_text_field($_POST['edavko_register_business_space_hisna_stevilka_add']) : '';
+		$obcina = isset($_POST['edavko_register_business_space_obcina']) ? sanitize_text_field($_POST['edavko_register_business_space_obcina']) : '';
+		$postna_stevilka = isset($_POST['edavko_register_business_space_postna_stevilka']) ? sanitize_text_field($_POST['edavko_register_business_space_postna_stevilka']) : '';
+		$mesto = isset($_POST['edavko_register_business_space_mesto']) ? sanitize_text_field($_POST['edavko_register_business_space_mesto']) : '';
+
+		if (!$id_business_space || !$katastrska_stevilka || !$stevilka_stavbe || !$stevilka_dela_stavbe || !$ulica || !$hisna_stevilka || !$obcina || !$postna_stevilka || !$mesto) {
+			$this->business_space_registration_result_message = '<p>Za registracijo poslovnega prostora morate izpolniti vsa polja!</p>';
+			return;
+		}
+
+		$request_body = [
+			'BusinessPremiseRequest' => [
+				'Header' => [
+					'MessageID' => wp_generate_uuid4(),
+					'DateTime' => date('Y-m-d\TH:i:s\Z')
+				],
+				'BusinessPremise' => [
+					// fiksna vrednost
+					'TaxNumber' => 10596631,
+					'BusinessPremiseID' => $id_business_space,
+					'BPIdentifier' => [
+						'RealEstateBP' => [
+							'PropertyID' => [
+								'CadastralNumber' => (int) $katastrska_stevilka,
+								'BuildingNumber' => (int) $stevilka_stavbe,
+								'BuildingSectionNumber' => (int) $stevilka_dela_stavbe
+							],
+							'Address' => [
+								'Street' => $ulica,
+								'HouseNumber' => $hisna_stevilka,
+								'HouseNumberAdditional' => $hisna_stevilka_add,
+								'Community' => $obcina,
+								'City' => $mesto,
+								'PostalCode' => $postna_stevilka
+							]
+						]
+					],
+					'ValidityDate' => date('Y-m-d\TH:i:s\Z'),
+					'SoftwareSupplier' => [
+						[
+							'TaxNumber' => 10596631 // fiksna vrednost
+						]
+					]
+				]
+			]
+		];
+
+		$request_body_json = json_encode($request_body);
+
+		// log request body in console
+		// echo '<script>console.log(' . json_encode($request_body_json) . ')</script>';
+
+		$url = 'http://studentdocker.informatika.uni-mb.si:49163/register';
+
+		$response = wp_remote_post(
+			$url,
+			[
+				'headers' => [
+					'Authorization' => 'Bearer 1002376637',
+					'Content-Type' => 'application/json'
+				],
+				'body' => $request_body_json
+			]
+		);
+
+		if (is_wp_error($response)) {
+			$this->business_space_registration_result_message = '<p>Registracija poslovnega prostora ni uspela. Poskusite znova.</p>';
+			return;
+		}
+
+		$response_data = json_decode(wp_remote_retrieve_body($response), true);
+
+		if (isset($response_data['error'])) {
+			$this->business_space_registration_result_message = '<p>' . esc_html($response_data['error']) . '</p>';
+			return;
+		}
+
+		$this->business_space_registration_result_message = '<p>Poslovni prostor uspešno registriran.</p>';
 	}
 }
