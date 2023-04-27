@@ -22,9 +22,6 @@ class edavko_Public
 
 	public function process_completed_order($order_id)
 	{
-		// Define the file path and name
-		$log_file_path = __DIR__ . '/request.log';
-
 		$order = wc_get_order($order_id);
 
 		$request_body = [
@@ -42,15 +39,15 @@ class edavko_Public
 						"ElectronicDeviceID" => get_option('edavko_furs_electronic_device_id'),
 						"InvoiceNumber" => $order->get_order_number()
 					],
-					"InvoiceAmount" => round(floatval($order->get_total()), 2),
-					"PaymentAmount" => round(floatval($order->get_total()), 2),
+					"InvoiceAmount" => (double) number_format($order->get_total(), 2),
+					"PaymentAmount" => (double) number_format($order->get_total(), 2),
 					"TaxesPerSeller" => [
 						[
 							"VAT" => [
 								[
-									"TaxRate" => round(floatval(22.00), 2),
-									"TaxableAmount" => round(floatval($order->get_total() / 1.22), 2),
-									"TaxAmount" => round(floatval($order->get_total() * 0.22 / 1.22), 2)
+									"TaxRate" => 22.00,
+									"TaxableAmount" => (double) number_format(($order->get_total() / 1.22), 2),
+									"TaxAmount" => (double) number_format(($order->get_total() * 0.22 / 1.22), 2),
 								]
 							]
 						]
@@ -62,10 +59,10 @@ class edavko_Public
 		];
 
 		$api_url = 'http://studentdocker.informatika.uni-mb.si:49163/invoice';
-		$bearer_token = '1002376637';
+		$bearer_token = get_option('edavko_furs_api_token');
 
-		// Log the response body to the file
-		file_put_contents($log_file_path, json_encode($request_body) . PHP_EOL, FILE_APPEND);
+		// $log_file_path = __DIR__ . '/request.log';
+		// file_put_contents($log_file_path, json_encode($request_body, JSON_PRESERVE_ZERO_FRACTION) . PHP_EOL, FILE_APPEND);
 
 		$response = wp_remote_post(
 			$api_url,
@@ -74,11 +71,12 @@ class edavko_Public
 					'Authorization' => 'Bearer ' . $bearer_token,
 					'Content-Type' => 'application/json'
 				],
-				'body' => json_encode($request_body)
+				'body' => json_encode($request_body, JSON_PRESERVE_ZERO_FRACTION)
 			]
 		);
 
 		if (is_wp_error($response)) {
+			// TODO nisem se še odločo kaj naredit v primeru napake
 			return;
 		} else {
 			$response_body = json_decode(wp_remote_retrieve_body($response), true);
@@ -95,11 +93,8 @@ class edavko_Public
 	public function add_zoi_eor_to_email($order, $sent_to_admin, $plain_text, $email)
 	{
 		if ($email->id == 'customer_completed_order') {
-			$zoi = $order->get_meta('furs_zoi');
-			$eor = $order->get_meta('furs_eor');
-
-			echo '<p><strong>ZOI:</strong> ' . $zoi . '</p>';
-			echo '<p><strong>EOR:</strong> ' . $eor . '</p>';
+			echo '<p><strong>ZOI:</strong> ' . get_post_meta($order->id, "furs_zoi", true) . '</p>';
+			echo '<p><strong>EOR:</strong> ' . get_post_meta($order->id, "furs_eor", true) . '</p>';
 		}
 	}
 }

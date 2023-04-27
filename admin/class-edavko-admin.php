@@ -577,7 +577,7 @@ class Edavko_Admin
 
 		$response = wp_remote_get($url, [
 			'headers' => [
-				'Authorization' => 'Bearer 1002376637'
+				'Authorization' => 'Bearer ' . get_option('edavko_furs_api_token')
 			]
 		]);
 
@@ -620,7 +620,7 @@ class Edavko_Admin
 
 		$response = wp_remote_get($url, [
 			'headers' => [
-				'Authorization' => 'Bearer 1002376637',
+				'Authorization' => 'Bearer ' . get_option('edavko_furs_api_token')
 			],
 		]);
 
@@ -661,7 +661,7 @@ class Edavko_Admin
 
 		$response = wp_remote_get($url, [
 			'headers' => [
-				'Authorization' => 'Bearer 1002376637'
+				'Authorization' => 'Bearer ' . get_option('edavko_furs_api_token')
 			]
 		]);
 
@@ -762,7 +762,7 @@ class Edavko_Admin
 			$url,
 			[
 				'headers' => [
-					'Authorization' => 'Bearer 1002376637',
+					'Authorization' => 'Bearer ' . get_option('edavko_furs_api_token'),
 					'Content-Type' => 'application/json'
 				],
 				'body' => $request_body_json

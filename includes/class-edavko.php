@@ -56,7 +56,7 @@ class edavko
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 		$this->loader->add_action('woocommerce_order_status_completed', $plugin_public, 'process_completed_order');
-		$this->loader->add_action('woocommerce_email_after_order_table', $plugin_public, 'add_zoi_eor_to_email', 10, 4);
+		$this->loader->add_action('woocommerce_email_order_meta', $plugin_public, 'add_zoi_eor_to_email', 10, 4);
 	}
 
 	public function run()
